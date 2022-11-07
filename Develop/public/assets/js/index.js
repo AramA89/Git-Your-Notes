@@ -4,6 +4,10 @@ let saveNoteBtn;
 let newNoteBtn;
 let noteList;
 
+const current = new Date();
+const input = document.querySelector('input');
+current.value = new Date(current.getTime() - current.getTimezoneOffset() * 60000).toISOString().substring(0, 19);
+
 if (window.location.pathname === '/notes') {
   noteTitle = document.querySelector('.note-title');
   noteText = document.querySelector('.note-textarea');
@@ -50,6 +54,14 @@ const deleteNote = (id) =>
     },
   });
 
+const editNote = (id) =>
+  fetch(`/api/notes/${id}`, {
+    method: 'EDIT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
 const renderActiveNote = () => {
   hide(saveNoteBtn);
 
@@ -70,6 +82,7 @@ const handleNoteSave = () => {
   const newNote = {
     title: noteTitle.value,
     text: noteText.value,
+    date: noteDate.value
   };
   saveNote(newNote).then(() => {
     getAndRenderNotes();
@@ -77,12 +90,33 @@ const handleNoteSave = () => {
   });
 };
 
+const handleNewNoteEdit = (event) => {
+  event.stopPropagation();
+  handleNewNoteEdit();
+
+const note = event.target;
+const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
+
+if(activeNote.id === noteId) {
+  activeNote = {
+    title: noteTitle.value.trim(),
+    text: noteText.value.trim(),
+    date: noteDate.value.trim()
+  };
+}
+
+editNote(noteId).then(() => saveNote(activeNote)).then(() => {
+  getAndRenderNotes();
+  renderActiveNote();
+});
+} 
+
 // Delete the clicked note
-const handleNoteDelete = (e) => {
+const handleNoteDelete = (event) => {
   // Prevents the click listener for the list from being called when the button inside of it is clicked
   e.stopPropagation();
 
-  const note = e.target;
+  const note = event.target;
   const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
 
   if (activeNote.id === noteId) {
@@ -96,14 +130,14 @@ const handleNoteDelete = (e) => {
 };
 
 // Sets the activeNote and displays it
-const handleNoteView = (e) => {
+const handleNoteView = (event) => {
   e.preventDefault();
-  activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note'));
+  activeNote = JSON.parse(event.target.parentElement.getAttribute('data-note'));
   renderActiveNote();
 };
 
 // Sets the activeNote to and empty object and allows the user to enter a new note
-const handleNewNoteView = (e) => {
+const handleNewNoteView = () => {
   activeNote = {};
   renderActiveNote();
 };
