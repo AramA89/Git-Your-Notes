@@ -7,7 +7,7 @@ let noteDate;
 
 const current = new Date();
 const input = document.querySelector('input');
-current.value = new Date(current.getTime() - current.getTimezoneOffset() * 60000).toISOString().substring(0, 19);
+input.value = new Date(current.getTime() - current.getTimezoneOffset() * 60000).toISOString().substring(0, 19);
 
 if (window.location.pathname === '/notes') {
   noteTitle = document.querySelector('.note-title');
@@ -78,7 +78,7 @@ const renderActiveNote = () => {
     // noteText.removeAttribute('readonly');
     noteTitle.value = '';
     noteText.value = '';
-    noteDate.date = '';
+    noteDate.value = '';
   }
 };
 
@@ -95,9 +95,9 @@ const handleNoteSave = () => {
   });
 };
 
-const handleNewNoteEdit = (event) => {
+const handleNoteEdit = (event) => {
   event.stopPropagation();
-  handleNewNoteEdit();
+  handleNoteView();
 
 const note = event.target;
 const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
@@ -114,12 +114,12 @@ editNote(noteId).then(() => saveNote(activeNote)).then(() => {
   getAndRenderNotes();
   renderActiveNote();
 });
-} 
+}; 
 
 // Delete the clicked note
 const handleNoteDelete = (event) => {
   // Prevents the click listener for the list from being called when the button inside of it is clicked
-  e.stopPropagation();
+  event.stopPropagation();
 
   const note = event.target;
   const noteId = JSON.parse(note.parentElement.getAttribute('data-note')).id;
@@ -136,7 +136,7 @@ const handleNoteDelete = (event) => {
 
 // Sets the activeNote and displays it
 const handleNoteView = (event) => {
-  e.preventDefault();
+  // event.preventDefault();
   activeNote = JSON.parse(event.target.parentElement.getAttribute('data-note'));
   renderActiveNote();
 };
@@ -161,7 +161,7 @@ const renderNoteList = async (notes) => {
   if (window.location.pathname === '/notes') {
     noteList.forEach((el) => (el.innerHTML = ''));
   }
-
+console.log(renderNoteList);
   let noteListItems = [];
 
   // Returns HTML element with or without a delete button
@@ -170,7 +170,7 @@ const renderNoteList = async (notes) => {
     liEl.classList.add('list-group-item');
 
     const spanEl = document.createElement('span');
-    spanEl.classList.add('list-item-title');
+    // spanEl.classList.add('list-item-title');
     spanEl.innerText = text;
     spanEl.addEventListener('click', handleNoteView);
 
@@ -203,6 +203,7 @@ const renderNoteList = async (notes) => {
 
     noteListItems.push(li);
   });
+  console.log(noteListItems.push(li));
 
   if (window.location.pathname === '/notes') {
     noteListItems.forEach((note) => noteList[0].append(note));

@@ -62,7 +62,7 @@ module.exports = (app) => {
                 let updateNote = {
                     title: req.body.title,
                     text: req.body.text,
-                    data: req.body.date,
+                    date: req.body.date,
                     id: chosenNote.id
                 };
                 let targetIndex = notesArr.indexOf(chosenNote);
